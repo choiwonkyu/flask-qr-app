@@ -1,3 +1,4 @@
+<!-- templates/add_branch.html -->
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -5,49 +6,38 @@
     <title>지점 관리</title>
 </head>
 <body>
-    <h1>📍 지점 추가</h1>
-
-    <form method="POST">
-        <input type="text" name="name" placeholder="지점명" required>
-        <input type="text" name="phone" placeholder="전화번호" required>
-        <input type="text" name="chat_url" placeholder="상담 채팅 URL" required>
-        <input type="text" name="slug" placeholder="slug (영문)" required>
-        <button type="submit">➕ 추가</button>
+    <h2>📌 지점 추가</h2>
+    <form method="POST" action="{{ url_for('add_branch_page') }}">
+        <label>지점명: <input type="text" name="name" required></label><br>
+        <label>전화번호: <input type="text" name="phone" required></label><br>
+        <label>채팅 URL: <input type="text" name="chat_url" required></label><br>
+        <label>슬러그(slug): <input type="text" name="slug" required></label><br>
+        <button type="submit">추가</button>
     </form>
 
-    <h2>📋 지점 목록</h2>
-    <table border="1" cellpadding="8">
-        <tr>
-            <th>지점명</th>
-            <th>전화번호</th>
-            <th>상담 URL</th>
-            <th>slug</th>
-            <th>수정</th>
-            <th>삭제</th>
-        </tr>
-        {% for branch in branches %}
-        <tr>
-            <td>
-                <a href="{{ url_for('branch_page', slug=branch['slug']) }}" target="_blank">
-                    {{ branch['name'] }}
-                </a>
-            </td>
-            <td>{{ branch['phone'] }}</td>
-            <td><a href="{{ branch['chat_url'] }}" target="_blank">열기</a></td>
-            <td>{{ branch['slug'] }}</td>
-            <td>
-                <a href="{{ url_for('edit_branch', slug=branch['slug']) }}">✏️ 수정</a>
-            </td>
-            <td>
-                <form method="POST" action="{{ url_for('delete_branch', slug=branch['slug']) }}">
-                    <button type="submit" onclick="return confirm('삭제하시겠습니까?')">🗑️ 삭제</button>
-                </form>
-            </td>
-        </tr>
-        {% endfor %}
-    </table>
+    <hr>
 
-    <br>
-    <a href="{{ url_for('logout') }}">🔒 로그아웃</a>
+    <h2>🏢 등록된 지점 목록</h2>
+    {% if branches %}
+        <ul>
+            {% for branch in branches %}
+                <li>
+                    <strong>
+                        <a href="{{ url_for('branch_page', slug=branch['slug']) }}" target="_blank">
+                            {{ branch['name'] }}
+                        </a>
+                    </strong> |
+                    전화: {{ branch['phone'] }} |
+                    <a href="{{ branch['chat_url'] }}" target="_blank">채팅</a> |
+                    <a href="{{ url_for('edit_branch', slug=branch['slug']) }}">✏️ 수정</a>
+                    <form method="POST" action="{{ url_for('delete_branch_route', slug=branch['slug']) }}" style="display:inline;">
+                        <button type="submit" onclick="return confirm('정말 삭제하시겠습니까?');">🗑️ 삭제</button>
+                    </form>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>등록된 지점이 없습니다.</p>
+    {% endif %}
 </body>
 </html>
