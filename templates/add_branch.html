@@ -1,18 +1,37 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="utf-8">
     <title>지점 추가</title>
 </head>
 <body>
-    <h2>🔐 지점 추가</h2>
-    <form method="post">
-        <p>비밀번호: <input type="password" name="password" required></p>
-        <p>지점명: <input type="text" name="name" required></p>
-        <p>전화번호: <input type="text" name="phone" required></p>
-        <p>채팅 URL: <input type="text" name="chat_url" required></p>
-        <p>슬러그 (/b/슬러그 형태로 접속됨): <input type="text" name="slug" required></p>
-        <p><button type="submit">추가하기</button></p>
+    <h1>지점 추가</h1>
+    <form method="POST">
+        <p><input type="password" name="password" placeholder="관리자 비밀번호" required></p>
+        <p><input type="text" name="name" placeholder="지점명" required></p>
+        <p><input type="text" name="phone" placeholder="전화번호 (예: tel:01012345678)" required></p>
+        <p><input type="text" name="chat_url" placeholder="네이버톡톡 URL" required></p>
+        <p><input type="text" name="slug" placeholder="지점 고유 주소 (예: gangnam)" required></p>
+        <p><button type="submit">지점 추가</button></p>
     </form>
-    <p><a href="/admin/list">📋 등록된 지점 목록 보기</a></p>
-</body>
-</html>
+
+    <hr>
+
+    <h2>📋 등록된 지점 목록</h2>
+{% if branches %}
+    <ul>
+        {% for branch in branches %}
+            <li>
+                <strong>{{ branch[1] }}</strong> (slug: <code>{{ branch[4] }}</code>)<br>
+                전화: {{ branch[2] }} | <a href="{{ branch[3] }}" target="_blank">채팅 링크</a><br>
+                접속 주소: <a href="/b/{{ branch[4] }}" target="_blank">/b/{{ branch[4] }}</a><br>
+                <form action="/admin/delete/{{ branch[4] }}" method="POST" style="display:inline;">
+                    <button type="submit" onclick="return confirm('정말 삭제하시겠습니까?')">❌ 삭제</button>
+                </form>
+                <a href="/admin/edit/{{ branch[4] }}"><button>✏️ 수정</button></a>
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>등록된 지점이 없습니다.</p>
+{% endif %}
