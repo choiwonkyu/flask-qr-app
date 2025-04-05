@@ -3,19 +3,9 @@
 <head>
     <title>지점 목록</title>
     <style>
-        table {
-            border-collapse: collapse;
-            width: 80%;
-            margin: 20px auto;
-        }
-        th, td {
-            border: 1px solid #999;
-            padding: 10px;
-            text-align: center;
-        }
-        th {
-            background-color: #eee;
-        }
+        table { border-collapse: collapse; width: 80%; margin: auto; }
+        th, td { border: 1px solid #aaa; padding: 8px; text-align: center; }
+        th { background-color: #f2f2f2; }
     </style>
 </head>
 <body>
@@ -24,19 +14,19 @@
         <tr>
             <th>ID</th>
             <th>지점명</th>
-            <th>전화번호</th>
-            <th>채팅 URL</th>
+            <th>전화</th>
+            <th>채팅</th>
             <th>슬러그</th>
-            <th>QR 접속 링크</th>
+            <th>접속링크</th>
         </tr>
         {% for branch in branches %}
         <tr>
-            <td>{{ branch['id'] }}</td>
-            <td>{{ branch['name'] }}</td>
-            <td>{{ branch['phone'] }}</td>
-            <td><a href="{{ branch['chat_url'] }}" target="_blank">링크</a></td>
-            <td>{{ branch['slug'] }}</td>
-            <td><a href="{{ url_for('branch_page', slug=branch['slug']) }}" target="_blank">/b/{{ branch['slug'] }}</a></td>
+            <td>{{ branch.id }}</td>
+            <td>{{ branch.name }}</td>
+            <td>{{ branch.phone }}</td>
+            <td><a href="{{ branch.chat_url }}" target="_blank">링크</a></td>
+            <td>{{ branch.slug }}</td>
+            <td><a href="{{ url_for('branch_page', slug=branch.slug) }}" target="_blank">/b/{{ branch.slug }}</a></td>
         </tr>
         {% endfor %}
     </table>
