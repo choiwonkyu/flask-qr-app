@@ -1,18 +1,70 @@
 <!DOCTYPE html>
-<html>
+<html lang="ko">
 <head>
-    <meta charset="utf-8">
-    <title>지점 수정</title>
+    <meta charset="UTF-8">
+    <title>지점 정보 수정</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 40px;
+            background-color: #f8f8f8;
+        }
+        h2 {
+            color: #333;
+        }
+        form {
+            background: #fff;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 0 5px rgba(0,0,0,0.1);
+            border-radius: 10px;
+        }
+        label {
+            display: block;
+            margin-top: 15px;
+        }
+        input[type="text"], input[type="url"], input[type="password"] {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #0e7de4;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        a {
+            display: inline-block;
+            margin-top: 20px;
+            text-decoration: none;
+            color: #0e7de4;
+        }
+    </style>
 </head>
 <body>
-    <h1>지점 수정</h1>
+    <h2>✏️ 지점 정보 수정</h2>
     <form method="POST">
-        <p><input type="password" name="password" placeholder="관리자 비밀번호" required></p>
-        <p><input type="text" name="name" value="{{ branch[1] }}" required></p>
-        <p><input type="text" name="phone" value="{{ branch[2] }}" required></p>
-        <p><input type="text" name="chat_url" value="{{ branch[3] }}" required></p>
-        <p><button type="submit">수정 완료</button></p>
+        <label for="name">지점 이름:</label>
+        <input type="text" name="name" value="{{ branch[1] }}" required>
+
+        <label for="phone">전화번호:</label>
+        <input type="text" name="phone" value="{{ branch[2] }}" required>
+
+        <label for="chat_url">채팅 URL:</label>
+        <input type="url" name="chat_url" value="{{ branch[3] }}" required>
+
+        <label for="password">관리자 비밀번호:</label>
+        <input type="password" name="password" required>
+
+        <button type="submit">수정 완료</button>
     </form>
-    <p><a href="/admin/add">← 돌아가기</a></p>
+
+    <a href="{{ url_for('add_branch_page') }}">← 돌아가기</a>
 </body>
 </html>

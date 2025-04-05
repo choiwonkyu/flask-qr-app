@@ -11,7 +11,7 @@ ADMIN_PASSWORD = "1234"  # 지점 수정/삭제시 사용
 # 인증 (관리자 페이지 비밀번호 보호)
 # ===============================
 def check_auth(username, password):
-    return username == 'admin' and password == 'your_password'  # 비번은 원하는 걸로 바꾸세요
+    return username == 'admin' and password == '9876'  # 비번은 원하는 걸로 바꾸세요
 
 def authenticate():
     return Response(
