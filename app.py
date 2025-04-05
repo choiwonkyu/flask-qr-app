@@ -1,164 +1,136 @@
-from flask import Flask, render_template, request, redirect, url_for, session, abort
-import sqlite3
+from flask import Flask, render_template, request, redirect, url_for, session
+import psycopg2
 import os
-from functools import wraps
+from dotenv import load_dotenv
 
+load_dotenv()
 app = Flask(__name__)
-app.secret_key = 'your_secret_key'  # 보안을 위해 랜덤 문자열로 바꿔주세요
+app.secret_key = 'your_secret_key'
 
-DATABASE = 'branches.db'
-ADMIN_USERNAME = 'admin'
-ADMIN_PASSWORD = '1234'
+DATABASE_URL = os.environ.get("DATABASE_URL")
+
+def get_db_connection():
+    conn = psycopg2.connect(DATABASE_URL)
+    return conn
 
 # ===============================
-# 로그인 관련
+# 로그인 페이지
 # ===============================
 @app.route('/', methods=['GET', 'POST'])
 def login():
-    error = None
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        if username == ADMIN_USERNAME and password == ADMIN_PASSWORD:
+        if username == 'admin' and password == '1234':
             session['logged_in'] = True
             return redirect(url_for('add_branch_page'))
-        else:
-            error = '❌ 아이디 또는 비밀번호가 올바르지 않습니다.'
-    return render_template('login.html', error=error)
-
-@app.route('/logout')
-def logout():
-    session.pop('logged_in', None)
-    return redirect(url_for('login'))
-
-# 로그인 확인 데코레이터
-def login_required(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if not session.get('logged_in'):
-            return redirect(url_for('login'))
-        return f(*args, **kwargs)
-    return decorated_function
+        return "❌ 아이디 또는 비밀번호가 틀렸습니다."
+    return render_template('login.html')
 
 # ===============================
-# DB 연결 및 초기화
-# ===============================
-def get_db_connection():
-    conn = sqlite3.connect(DATABASE)
-    conn.row_factory = sqlite3.Row
-    return conn
-
-def init_db():
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS branches (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL,
-            phone TEXT NOT NULL,
-            chat_url TEXT NOT NULL,
-            slug TEXT UNIQUE NOT NULL
-        )
-    ''')
-    conn.commit()
-    conn.close()
-
-# ===============================
-# 지점 관련 함수
-# ===============================
-def add_branch(name, phone, chat_url, slug):
-    conn = get_db_connection()
-    try:
-        conn.execute('''
-            INSERT INTO branches (name, phone, chat_url, slug)
-            VALUES (?, ?, ?, ?)
-        ''', (name, phone, chat_url, slug))
-        conn.commit()
-    except sqlite3.IntegrityError:
-        conn.close()
-        return False
-    conn.close()
-    return True
-
-def get_all_branches():
-    conn = get_db_connection()
-    branches = conn.execute('SELECT * FROM branches').fetchall()
-    conn.close()
-    return branches
-
-def get_branch_by_slug(slug):
-    conn = get_db_connection()
-    branch = conn.execute('SELECT * FROM branches WHERE slug = ?', (slug,)).fetchone()
-    conn.close()
-    return branch
-
-def delete_branch(slug):
-    conn = get_db_connection()
-    conn.execute('DELETE FROM branches WHERE slug = ?', (slug,))
-    conn.commit()
-    conn.close()
-
-def update_branch(name, phone, chat_url, slug):
-    conn = get_db_connection()
-    conn.execute('''
-        UPDATE branches SET name = ?, phone = ?, chat_url = ? WHERE slug = ?
-    ''', (name, phone, chat_url, slug))
-    conn.commit()
-    conn.close()
-
-# ===============================
-# 지점 관리 페이지
+# 지점 추가 + 목록
 # ===============================
 @app.route('/admin/add', methods=['GET', 'POST'])
-@login_required
 def add_branch_page():
+    if not session.get('logged_in'):
+        return redirect(url_for('login'))
+
+    conn = get_db_connection()
+    cur = conn.cursor()
+
     if request.method == 'POST':
         name = request.form['name']
         phone = request.form['phone']
         chat_url = request.form['chat_url']
         slug = request.form['slug']
-        success = add_branch(name, phone, chat_url, slug)
-        if not success:
-            return "❌ 이미 존재하는 슬러그입니다. 다른 슬러그를 입력하세요."
-    branches = get_all_branches()
+        try:
+            cur.execute("""
+                INSERT INTO branches (name, phone, chat_url, slug)
+                VALUES (%s, %s, %s, %s)
+            """, (name, phone, chat_url, slug))
+            conn.commit()
+        except psycopg2.errors.UniqueViolation:
+            conn.rollback()
+            return "❌ 이미 존재하는 슬러그입니다."
+
+    cur.execute("SELECT * FROM branches ORDER BY id DESC")
+    branches = cur.fetchall()
+    cur.close()
+    conn.close()
+
     return render_template('add_branch.html', branches=branches)
 
+# ===============================
+# 지점 삭제
+# ===============================
 @app.route('/admin/delete/<slug>', methods=['POST'])
-@login_required
-def delete_branch_route(slug):
-    delete_branch(slug)
+def delete_branch(slug):
+    if not session.get('logged_in'):
+        return redirect(url_for('login'))
+
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute("DELETE FROM branches WHERE slug = %s", (slug,))
+    conn.commit()
+    cur.close()
+    conn.close()
+
     return redirect(url_for('add_branch_page'))
 
+# ===============================
+# 지점 수정
+# ===============================
 @app.route('/admin/edit/<slug>', methods=['GET', 'POST'])
-@login_required
 def edit_branch(slug):
-    branch = get_branch_by_slug(slug)
-    if request.method == 'POST':
-        password = request.form.get('password')
-        if password != ADMIN_PASSWORD:
-            return "비밀번호가 틀렸습니다.", 403
+    if not session.get('logged_in'):
+        return redirect(url_for('login'))
 
+    conn = get_db_connection()
+    cur = conn.cursor()
+
+    if request.method == 'POST':
         name = request.form['name']
         phone = request.form['phone']
         chat_url = request.form['chat_url']
-        update_branch(name, phone, chat_url, slug)
+        cur.execute("""
+            UPDATE branches
+            SET name = %s, phone = %s, chat_url = %s
+            WHERE slug = %s
+        """, (name, phone, chat_url, slug))
+        conn.commit()
+        cur.close()
+        conn.close()
         return redirect(url_for('add_branch_page'))
+
+    cur.execute("SELECT * FROM branches WHERE slug = %s", (slug,))
+    branch = cur.fetchone()
+    cur.close()
+    conn.close()
+
+    if not branch:
+        return "❌ 지점 정보를 찾을 수 없습니다.", 404
+
     return render_template('edit_branch.html', branch=branch)
 
 # ===============================
-# 고객 QR 페이지 (지점 접속)
+# 지점 상세 페이지 (고객용)
 # ===============================
 @app.route('/b/<slug>')
 def branch_page(slug):
-    branch = get_branch_by_slug(slug)
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute("SELECT name, phone, chat_url FROM branches WHERE slug = %s", (slug,))
+    branch = cur.fetchone()
+    cur.close()
+    conn.close()
+
     if not branch:
         return "❌ 지점 정보를 찾을 수 없습니다.", 404
-    return render_template('branch_page.html', branch=branch)
+
+    return render_template('branch_page.html', name=branch[0], phone=branch[1], chat_url=branch[2])
 
 # ===============================
 # 앱 실행
 # ===============================
 if __name__ == '__main__':
-    if not os.path.exists(DATABASE):
-        init_db()
     app.run(debug=True)

@@ -1,74 +1,51 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html>
 <head>
-    <meta charset="UTF-8">
     <title>관리자 로그인</title>
     <style>
         body {
-            background-color: #f8f9fa;
             display: flex;
+            height: 100vh;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            margin: 0;
-            font-family: 'Arial', sans-serif;
+            font-family: sans-serif;
         }
-
         .login-box {
-            background-color: white;
-            padding: 40px 50px;
-            border-radius: 12px;
-            box-shadow: 0 0 12px rgba(0,0,0,0.1);
             text-align: center;
-            width: 100%;
-            max-width: 400px;
+            border: 2px solid #ccc;
+            padding: 40px;
+            border-radius: 10px;
+            width: 400px;
         }
-
-        h1 {
-            font-size: 28px;
-            margin-bottom: 30px;
-        }
-
-        input[type="text"],
-        input[type="password"] {
+        input {
             width: 100%;
-            padding: 16px;
+            padding: 15px;
+            margin: 10px 0;
             font-size: 18px;
-            margin-bottom: 20px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
         }
-
         button {
             width: 100%;
-            padding: 16px;
-            font-size: 20px;
-            background-color: #007bff;
+            padding: 15px;
+            font-size: 18px;
+            background-color: #4CAF50;
             color: white;
             border: none;
-            border-radius: 8px;
             cursor: pointer;
         }
-
-        button:hover {
-            background-color: #0056b3;
-        }
-
-        .error {
-            color: red;
-            margin-bottom: 15px;
-        }
+        .flash { color: red; }
     </style>
 </head>
 <body>
     <div class="login-box">
-        <h1>관리자 로그인</h1>
-        {% if error %}
-            <div class="error">{{ error }}</div>
-        {% endif %}
-        <form method="POST">
-            <input type="text" name="username" placeholder="아이디를 입력하세요" required>
-            <input type="password" name="password" placeholder="비밀번호를 입력하세요" required>
+        <h2>관리자 로그인</h2>
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <div class="flash">{{ messages[0] }}</div>
+          {% endif %}
+        {% endwith %}
+        <form action="/login" method="post">
+            <input type="text" name="username" placeholder="아이디" required>
+            <input type="password" name="password" placeholder="비밀번호" required>
             <button type="submit">로그인</button>
         </form>
     </div>
