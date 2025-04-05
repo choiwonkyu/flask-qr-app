@@ -21,7 +21,7 @@ def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        if username == 'admin' and password == '1234':
+        if username == 'admin' and password == '9876':
             session['logged_in'] = True
             return redirect(url_for('add_branch_page'))
         return "❌ 아이디 또는 비밀번호가 틀렸습니다."
