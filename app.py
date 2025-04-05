@@ -5,7 +5,7 @@ from functools import wraps
 
 app = Flask(__name__)
 DATABASE = 'branches.db'
-ADMIN_PASSWORD = "1234"  # 지점 수정/삭제시 사용
+ADMIN_PASSWORD = "9876"  # 지점 수정/삭제시 사용
 
 # ===============================
 # 인증 (관리자 페이지 비밀번호 보호)
