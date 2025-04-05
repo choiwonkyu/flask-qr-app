@@ -164,3 +164,9 @@ if __name__ == '__main__':
     if not os.path.exists(DATABASE):
         init_db()
     app.run(debug=True)
+
+
+
+@app.route('/')
+def index():
+    return render_template('index.html')
