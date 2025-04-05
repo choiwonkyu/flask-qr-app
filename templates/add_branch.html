@@ -1,37 +1,84 @@
 <!DOCTYPE html>
-<html>
+<html lang="ko">
 <head>
-    <meta charset="utf-8">
+    <meta charset="UTF-8">
     <title>지점 추가</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 40px;
+        }
+        form {
+            margin-bottom: 40px;
+        }
+        input[type="text"] {
+            padding: 5px;
+            width: 300px;
+        }
+        table {
+            border-collapse: collapse;
+            width: 90%;
+        }
+        th, td {
+            border: 1px solid #999;
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .btn-delete, .btn-edit {
+            margin-right: 5px;
+            padding: 4px 8px;
+            text-decoration: none;
+            background-color: #eee;
+            border: 1px solid #aaa;
+            border-radius: 3px;
+            color: black;
+        }
+        .btn-delete:hover {
+            background-color: #fdd;
+        }
+        .btn-edit:hover {
+            background-color: #def;
+        }
+    </style>
 </head>
 <body>
     <h1>지점 추가</h1>
-    <form method="POST">
-        <p><input type="password" name="password" placeholder="관리자 비밀번호" required></p>
-        <p><input type="text" name="name" placeholder="지점명" required></p>
-        <p><input type="text" name="phone" placeholder="전화번호 (예: tel:01012345678)" required></p>
-        <p><input type="text" name="chat_url" placeholder="네이버톡톡 URL" required></p>
-        <p><input type="text" name="slug" placeholder="지점 고유 주소 (예: gangnam)" required></p>
-        <p><button type="submit">지점 추가</button></p>
+    <form method="post">
+        <label>지점 이름: <input type="text" name="name" required></label><br><br>
+        <label>전화번호: <input type="text" name="phone" required></label><br><br>
+        <label>채팅 URL (예: 네이버톡톡 주소): <input type="text" name="chat_url" required></label><br><br>
+        <label>슬러그 (영문지점코드): <input type="text" name="slug" required></label><br><br>
+        <button type="submit">지점 추가</button>
     </form>
 
-    <hr>
-
-    <h2>📋 등록된 지점 목록</h2>
-{% if branches %}
-    <ul>
+    <h2>등록된 지점 목록</h2>
+    {% if branches %}
+    <table>
+        <tr>
+            <th>이름</th>
+            <th>전화번호</th>
+            <th>채팅 URL</th>
+            <th>슬러그</th>
+            <th>관리</th>
+        </tr>
         {% for branch in branches %}
-            <li>
-                <strong>{{ branch[1] }}</strong> (slug: <code>{{ branch[4] }}</code>)<br>
-                전화: {{ branch[2] }} | <a href="{{ branch[3] }}" target="_blank">채팅 링크</a><br>
-                접속 주소: <a href="/b/{{ branch[4] }}" target="_blank">/b/{{ branch[4] }}</a><br>
-                <form action="/admin/delete/{{ branch[4] }}" method="POST" style="display:inline;">
-                    <button type="submit" onclick="return confirm('정말 삭제하시겠습니까?')">❌ 삭제</button>
-                </form>
-                <a href="/admin/edit/{{ branch[4] }}"><button>✏️ 수정</button></a>
-            </li>
+        <tr>
+            <td>{{ branch[1] }}</td> <!-- name -->
+            <td>{{ branch[2] }}</td> <!-- phone -->
+            <td><a href="{{ branch[3] }}" target="_blank">바로가기</a></td> <!-- chat_url -->
+            <td>{{ branch[4] }}</td> <!-- slug -->
+            <td>
+                <a href="/admin/edit/{{ branch[0] }}" class="btn-edit">수정</a>
+                <a href="/admin/delete/{{ branch[0] }}" class="btn-delete" onclick="return confirm('삭제하시겠습니까?');">삭제</a>
+            </td>
+        </tr>
         {% endfor %}
-    </ul>
-{% else %}
+    </table>
+    {% else %}
     <p>등록된 지점이 없습니다.</p>
-{% endif %}
+    {% endif %}
+</body>
+</html>
