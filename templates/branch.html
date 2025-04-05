@@ -1,11 +1,38 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>{{ branch.name }} 지점</title>
+    <title>{{ branch['name'] }} 지점</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            text-align: center;
+            padding: 50px;
+        }
+        h2 {
+            font-size: 24px;
+            margin-bottom: 30px;
+        }
+        .button {
+            display: inline-block;
+            padding: 15px 30px;
+            margin: 10px;
+            font-size: 18px;
+            border-radius: 10px;
+            text-decoration: none;
+            color: white;
+        }
+        .call {
+            background-color: #28a745;
+        }
+        .chat {
+            background-color: #007bff;
+        }
+    </style>
 </head>
 <body>
-  <h1>{{ branch.name }} 지점</h1>
-  <p><a href="tel:{{ branch.phone }}">📞 전화 연결</a></p>
-  <p><a href="{{ branch.chat_url }}" target="_blank">💬 채팅 상담 (네이버 톡톡)</a></p>
+    <h2>📍 {{ branch['name'] }} 지점입니다<br>어떤 방법으로 연결하시겠어요?</h2>
+
+    <a class="button call" href="tel:{{ branch['phone'] }}">📞 전화 연결하기</a>
+    <a class="button chat" href="{{ branch['chat_url'] }}" target="_blank">💬 채팅 상담하기</a>
 </body>
 </html>
