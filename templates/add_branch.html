@@ -2,115 +2,52 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>지점 추가 및 관리</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            padding: 40px;
-            background-color: #f8f8f8;
-        }
-        h2 {
-            color: #333;
-        }
-        form {
-            background: #fff;
-            padding: 20px;
-            margin-bottom: 30px;
-            box-shadow: 0 0 5px rgba(0,0,0,0.1);
-            border-radius: 10px;
-        }
-        label {
-            display: block;
-            margin-top: 10px;
-        }
-        input[type="text"], input[type="url"] {
-            width: 100%;
-            padding: 8px;
-            margin-top: 5px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-        }
-        button {
-            margin-top: 15px;
-            padding: 10px 20px;
-            background-color: #0e7de4;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        table {
-            width: 100%;
-            background: white;
-            border-collapse: collapse;
-            box-shadow: 0 0 5px rgba(0,0,0,0.1);
-        }
-        th, td {
-            padding: 10px;
-            border-bottom: 1px solid #eee;
-            text-align: left;
-        }
-        .actions form {
-            display: inline;
-        }
-        .actions button {
-            background-color: #f44336;
-            margin-right: 5px;
-        }
-        .actions a {
-            text-decoration: none;
-            padding: 8px 12px;
-            background-color: #4CAF50;
-            color: white;
-            border-radius: 5px;
-        }
-    </style>
+    <title>지점 관리</title>
 </head>
 <body>
-    <h2>➕ 지점 추가</h2>
-    <form method="POST" action="/admin/add">
-        <label for="name">지점 이름:</label>
-        <input type="text" name="name" required>
+    <h1>📍 지점 추가</h1>
 
-        <label for="phone">전화번호:</label>
-        <input type="text" name="phone" required>
-
-        <label for="chat_url">채팅 URL:</label>
-        <input type="url" name="chat_url" required>
-
-        <label for="slug">지점 슬러그 (URL 식별자):</label>
-        <input type="text" name="slug" required>
-
-        <button type="submit">지점 추가</button>
+    <form method="POST">
+        <input type="text" name="name" placeholder="지점명" required>
+        <input type="text" name="phone" placeholder="전화번호" required>
+        <input type="text" name="chat_url" placeholder="상담 채팅 URL" required>
+        <input type="text" name="slug" placeholder="slug (영문)" required>
+        <button type="submit">➕ 추가</button>
     </form>
 
-    <h2>📋 등록된 지점 목록</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>지점명</th>
-                <th>전화번호</th>
-                <th>채팅 URL</th>
-                <th>슬러그</th>
-                <th>관리</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for branch in branches %}
-            <tr>
-                <td>{{ branch[1] }}</td>
-                <td>{{ branch[2] }}</td>
-                <td><a href="{{ branch[3] }}" target="_blank">채팅 링크</a></td>
-                <td>{{ branch[4] }}</td>
-                <td class="actions">
-                    <a href="{{ url_for('edit_branch', slug=branch[4]) }}">수정</a>
-                    <form method="POST" action="{{ url_for('delete_branch_route', slug=branch[4]) }}" onsubmit="return confirm('정말 삭제하시겠습니까?');">
-                        <button type="submit">삭제</button>
-                    </form>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
+    <h2>📋 지점 목록</h2>
+    <table border="1" cellpadding="8">
+        <tr>
+            <th>지점명</th>
+            <th>전화번호</th>
+            <th>상담 URL</th>
+            <th>slug</th>
+            <th>수정</th>
+            <th>삭제</th>
+        </tr>
+        {% for branch in branches %}
+        <tr>
+            <td>
+                <a href="{{ url_for('branch_page', slug=branch['slug']) }}" target="_blank">
+                    {{ branch['name'] }}
+                </a>
+            </td>
+            <td>{{ branch['phone'] }}</td>
+            <td><a href="{{ branch['chat_url'] }}" target="_blank">열기</a></td>
+            <td>{{ branch['slug'] }}</td>
+            <td>
+                <a href="{{ url_for('edit_branch', slug=branch['slug']) }}">✏️ 수정</a>
+            </td>
+            <td>
+                <form method="POST" action="{{ url_for('delete_branch', slug=branch['slug']) }}">
+                    <button type="submit" onclick="return confirm('삭제하시겠습니까?')">🗑️ 삭제</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
     </table>
+
+    <br>
+    <a href="{{ url_for('logout') }}">🔒 로그아웃</a>
 </body>
 </html>
