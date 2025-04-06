@@ -50,7 +50,8 @@
         }
 
         table {
-            width: 1000px;
+            width: 100%;
+            max-width: 1200px;
             border-collapse: collapse;
             margin-top: 20px;
             background: #fff;
@@ -63,11 +64,19 @@
             padding: 15px;
             text-align: center;
             border-bottom: 1px solid #ddd;
+            word-break: break-word;
         }
 
         th {
             background-color: #e8f0fe;
         }
+
+        th:nth-child(1), td:nth-child(1) { min-width: 120px; }
+        th:nth-child(2), td:nth-child(2) { min-width: 130px; }
+        th:nth-child(3), td:nth-child(3) { min-width: 180px; max-width: 250px; }
+        th:nth-child(4), td:nth-child(4) { min-width: 100px; }
+        th:nth-child(5), td:nth-child(5) { min-width: 120px; }
+        th:nth-child(6), td:nth-child(6) { min-width: 100px; }
 
         img.qr {
             width: 100px;
@@ -126,7 +135,7 @@
             {% for branch in branches %}
             <tr>
                 <!-- 지점명 -->
-                <td><a href="{{ url_for('branch_page', slug=branch[4]) }}" target="_blank">{{ branch[0] }}</a></td>
+                <td><a href="{{ url_for('branch_page', slug=branch[3]) }}" target="_blank">{{ branch[0] }}</a></td>
 
                 <!-- 전화번호 -->
                 <td>{{ branch[1] }}</td>
