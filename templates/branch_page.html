@@ -2,32 +2,44 @@
 <html>
 <head>
     <title>{{ branch.name }} 지점 페이지</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         body {
             font-family: sans-serif;
+            background-color: #f4f4f4;
             text-align: center;
-            padding: 100px 20px;
+            padding: 60px 20px;
         }
+
         h1 {
-            font-size: 36px;
-            margin-bottom: 40px;
+            font-size: 40px;
+            margin-bottom: 50px;
+            color: #333;
         }
+
         .btn {
-            display: inline-block;
-            width: 200px;
-            padding: 20px;
-            margin: 20px;
-            font-size: 20px;
+            display: block;
+            width: 80%;
+            max-width: 320px;
+            padding: 25px;
+            margin: 20px auto;
+            font-size: 22px;
             background-color: #2196F3;
             color: white;
             text-decoration: none;
-            border-radius: 10px;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s ease;
+        }
+
+        .btn:hover {
+            background-color: #1976D2;
         }
     </style>
 </head>
 <body>
     <h1>{{ branch.name }} 지점</h1>
-    <a href="tel:{{ branch.phone }}" class="btn">업무폰 연결</a>
-    <a href="#" class="btn">상담 채팅</a>
+    <a href="tel:{{ branch.phone }}" class="btn">📞 업무폰 연결</a>
+    <a href="{{ branch.chat_url }}" class="btn">💬 상담 채팅</a>
 </body>
 </html>
