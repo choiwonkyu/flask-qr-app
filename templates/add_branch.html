@@ -71,12 +71,13 @@
             background-color: #e8f0fe;
         }
 
-        th:nth-child(1), td:nth-child(1) { min-width: 120px; }
-        th:nth-child(2), td:nth-child(2) { min-width: 130px; }
-        th:nth-child(3), td:nth-child(3) { min-width: 180px; max-width: 250px; }
-        th:nth-child(4), td:nth-child(4) { min-width: 100px; }
-        th:nth-child(5), td:nth-child(5) { min-width: 120px; }
-        th:nth-child(6), td:nth-child(6) { min-width: 100px; }
+        /* ✅ 칼럼별 최소 너비 설정 */
+        th:nth-child(1), td:nth-child(1) { min-width: 200px; } /* 지점명 */
+        th:nth-child(2), td:nth-child(2) { min-width: 130px; } /* 전화번호 */
+        th:nth-child(3), td:nth-child(3) { min-width: 250px; max-width: 350px; } /* 채팅 주소 */
+        th:nth-child(4), td:nth-child(4) { min-width: 100px; } /* 접속 코드 */
+        th:nth-child(5), td:nth-child(5) { min-width: 120px; } /* QR 코드 */
+        th:nth-child(6), td:nth-child(6) { min-width: 80px; }  /* 관리 */
 
         img.qr {
             width: 100px;
