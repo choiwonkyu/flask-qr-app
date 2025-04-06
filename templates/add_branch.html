@@ -1,41 +1,175 @@
 <!DOCTYPE html>
-<html>
+<html lang="ko">
 <head>
-    <title>지점 관리</title>
+    <meta charset="UTF-8">
+    <title>지점 추가</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 40px 0;
+            display: flex;
+            justify-content: center;
+        }
+        .container {
+            width: 90%;
+            max-width: 1000px;
+        }
+        h2 {
+            color: #333;
+            margin-top: 40px;
+        }
+        form {
+            background: #fff;
+            padding: 25px;
+            margin-top: 20px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.05);
+            border-radius: 10px;
+        }
+        label {
+            display: block;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+        input[type="text"], input[type="url"] {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+        }
+        button {
+            margin-top: 20px;
+            padding: 12px 20px;
+            background-color: #0e7de4;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 15px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 40px;
+            background: #fff;
+            box-shadow: 0 0 8px rgba(0,0,0,0.05);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        th, td {
+            padding: 16px;
+            border: 1px solid #ddd;
+            text-align: center;
+            font-size: 14px;
+        }
+        th {
+            background-color: #f0f0f0;
+        }
+        a.button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 4px;
+            text-decoration: none;
+        }
+        form button {
+            background-color: #e74c3c;
+        }
+        a {
+            color: #0e7de4;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .qr-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+    </style>
+    <!-- QR 생성용 라이브러리 -->
+    <script src="https://cdn.jsdelivr.net/npm/qrious/dist/qrious.min.js"></script>
 </head>
 <body>
-    <h1>📌 지점 추가</h1>
-    <form method="post">
-        <input type="text" name="name" placeholder="지점명" required>
-        <input type="text" name="phone" placeholder="전화번호" required>
-        <input type="text" name="chat_url" placeholder="채팅 주소" required>
-        <input type="text" name="slug" placeholder="접속 코드 (영문, 고유)" required>
-        <button type="submit">추가</button>
+<div class="container">
+    <h2>➕ 지점 추가</h2>
+    <form method="POST">
+        <label for="name">지점 이름:</label>
+        <input type="text" name="name" required>
+
+        <label for="phone">전화번호:</label>
+        <input type="text" name="phone" required>
+
+        <label for="chat_url">채팅 URL:</label>
+        <input type="url" name="chat_url" required>
+
+        <label for="slug">접속 코드 (slug):</label>
+        <input type="text" name="slug" required>
+
+        <button type="submit">등록</button>
     </form>
 
     <h2>📋 지점 목록</h2>
-    <table border="1">
+    <table>
+        <thead>
         <tr>
             <th>지점명</th>
             <th>전화번호</th>
             <th>채팅 주소</th>
             <th>접속 코드</th>
-            <th>관리</th>
+            <th>QR 코드</th>
+            <th>수정</th>
+            <th>삭제</th>
         </tr>
+        </thead>
+        <tbody>
         {% for branch in branches %}
         <tr>
-            <td>{{ branch[0] }}</td>
-            <td>{{ branch[1] }}</td>
+            <td><a href="{{ url_for('branch_page', slug=branch[4]) }}">{{ branch[1] }}</a></td>
             <td>{{ branch[2] }}</td>
-            <td>{{ branch[3] }}</td>
+            <td><a href="{{ branch[3] }}" target="_blank">{{ branch[3] }}</a></td>
+            <td>{{ branch[4] }}</td>
             <td>
-                <a href="{{ url_for('edit_branch', slug=branch[3]) }}">수정</a>
-                <form method="post" action="{{ url_for('delete_branch', slug=branch[3]) }}" style="display:inline;">
+                <div class="qr-actions">
+                    <canvas id="qr-{{ loop.index }}" style="display:none;"></canvas>
+                    <button onclick="generateQR('{{ branch[4] }}', {{ loop.index }})">생성</button>
+                    <button onclick="downloadQR({{ loop.index }}, '{{ branch[1] }}')">다운</button>
+                </div>
+            </td>
+            <td>
+                <a href="{{ url_for('edit_branch', slug=branch[4]) }}" class="button">수정</a>
+            </td>
+            <td>
+                <form method="POST" action="{{ url_for('delete_branch', slug=branch[4]) }}">
                     <button type="submit">삭제</button>
                 </form>
             </td>
         </tr>
         {% endfor %}
+        </tbody>
     </table>
+</div>
+
+<script>
+    function generateQR(slug, index) {
+        const qr = new QRious({
+            element: document.getElementById('qr-' + index),
+            value: window.location.origin + '/b/' + slug,
+            size: 200
+        });
+        document.getElementById('qr-' + index).style.display = 'block';
+    }
+
+    function downloadQR(index, branchName) {
+        const canvas = document.getElementById('qr-' + index);
+        const link = document.createElement('a');
+        link.href = canvas.toDataURL("image/png");
+        link.download = branchName + '_QR.png';
+        link.click();
+    }
+</script>
 </body>
 </html>
