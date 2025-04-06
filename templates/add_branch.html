@@ -1,3 +1,24 @@
+<h2>지점 추가</h2>
+<form method="POST" action="{{ url_for('add_branch') }}">
+    <label for="name">지점명:</label>
+    <input type="text" name="name" required><br>
+
+    <label for="phone">전화번호:</label>
+    <input type="text" name="phone" required><br>
+
+    <label for="chat_url">채팅 주소:</label>
+    <input type="url" name="chat_url" required><br>
+
+    <label for="slug">접속 코드 (영문, 숫자):</label>
+    <input type="text" name="slug" required><br>
+
+    <button type="submit">추가</button>
+</form>
+
+<hr>
+
+<h2>지점 목록</h2>
+
 <style>
     table {
         width: 100%;
