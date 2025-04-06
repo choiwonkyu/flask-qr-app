@@ -85,6 +85,11 @@
             margin-top: 5px;
             font-size: 12px;
         }
+
+        a {
+            color: #0e7de4;
+            text-decoration: none;
+        }
     </style>
 </head>
 <body>
@@ -120,23 +125,24 @@
         <tbody>
             {% for branch in branches %}
             <tr>
-                <!-- 지점명 (branch[1]) -->
+                <!-- 지점명 -->
                 <td><a href="{{ url_for('branch_page', slug=branch[4]) }}" target="_blank">{{ branch[1] }}</a></td>
 
-                <!-- 전화번호 (branch[2]) -->
+                <!-- 전화번호 -->
                 <td>{{ branch[2] }}</td>
 
-                <!-- 채팅 주소 (branch[3]) -->
+                <!-- 채팅 주소 -->
                 <td><a href="{{ branch[3] }}" target="_blank">{{ branch[3] }}</a></td>
 
-                <!-- 접속 코드 (branch[4]) -->
+                <!-- 접속 코드 -->
                 <td>{{ branch[4] }}</td>
 
                 <!-- QR 코드 -->
                 <td>
-                    <img class="qr" src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={{ request.host_url }}b/{{ branch[4] }}" alt="QR Code">
+                    {% set qr_url = request.url_root ~ 'b/' ~ branch[4] %}
+                    <img class="qr" src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={{ qr_url | urlencode }}" alt="QR Code">
                     <br>
-                    <a class="download-link" href="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={{ request.host_url }}b/{{ branch[4] }}" download="QR_{{ branch[4] }}.png">⬇️ 다운로드</a>
+                    <a class="download-link" href="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={{ qr_url | urlencode }}" download="QR_{{ branch[4] }}.png">⬇️ 다운로드</a>
                 </td>
 
                 <!-- 관리 -->
