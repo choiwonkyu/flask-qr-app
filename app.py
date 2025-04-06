@@ -1,7 +1,9 @@
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, session, send_file
 import psycopg2
 import os
 from dotenv import load_dotenv
+from io import BytesIO
+import qrcode
 
 load_dotenv()
 app = Flask(__name__)
@@ -128,6 +130,18 @@ def branch_page(slug):
         return "❌ 지점 정보를 찾을 수 없습니다.", 404
 
     return render_template('branch_page.html', name=branch[0], phone=branch[1], chat_url=branch[2])
+
+# ===============================
+# QR 코드 생성
+# ===============================
+@app.route('/qr/<slug>')
+def generate_qr(slug):
+    url = url_for('branch_page', slug=slug, _external=True)
+    qr = qrcode.make(url)
+    img_io = BytesIO()
+    qr.save(img_io, 'PNG')
+    img_io.seek(0)
+    return send_file(img_io, mimetype='image/png')
 
 # ===============================
 # 앱 실행
