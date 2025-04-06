@@ -1,131 +1,98 @@
-<h2>지점 추가</h2>
-<form method="POST" action="{{ url_for('add_branch') }}">
-    <label for="name">지점명:</label>
-    <input type="text" name="name" required><br>
+""
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>지점 관리</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        th, td {
+            vertical-align: middle !important;
+            text-align: center;
+            word-break: keep-all;
+        }
+        th {
+            white-space: nowrap;
+        }
+        .qr-image {
+            width: 100px;
+            height: 100px;
+        }
+        .qr-download {
+            font-size: 0.8rem;
+        }
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            min-width: 80px;
+        }
+    </style>
+</head>
+<body class="bg-light">
+<div class="container mt-4">
+    <h2 class="mb-4">지점 관리</h2>
 
-    <label for="phone">전화번호:</label>
-    <input type="text" name="phone" required><br>
+    <form method="POST" action="{{ url_for('add_branch_page') }}" class="row g-2 align-items-end">
+        <div class="col-md-3">
+            <label class="form-label">지점명</label>
+            <input type="text" class="form-control" name="name" required>
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">전화번호</label>
+            <input type="text" class="form-control" name="phone" required>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">채팅 주소</label>
+            <input type="url" class="form-control" name="chat_url" required>
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">접속 코드</label>
+            <input type="text" class="form-control" name="slug" required>
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-primary w-100">추가</button>
+        </div>
+    </form>
 
-    <label for="chat_url">채팅 주소:</label>
-    <input type="url" name="chat_url" required><br>
+    <hr>
 
-    <label for="slug">접속 코드 (영문, 숫자):</label>
-    <input type="text" name="slug" required><br>
-
-    <button type="submit">추가</button>
-</form>
-
-<hr>
-
-<h2>지점 목록</h2>
-
-<style>
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 20px;
-        background: #fff;
-        box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        border-radius: 10px;
-        overflow: hidden;
-    }
-
-    th, td {
-        padding: 15px;
-        text-align: center;
-        border-bottom: 1px solid #ddd;
-        vertical-align: top;
-    }
-
-    th {
-        background-color: #e8f0fe;
-    }
-
-    img.qr {
-        width: 120px;
-        height: 120px;
-    }
-
-    .download-link {
-        display: inline-block;
-        margin-top: 5px;
-        font-size: 12px;
-    }
-
-    .actions {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 8px;
-        min-width: 70px;
-    }
-
-    .actions button,
-    .actions a {
-        margin: 0;
-        padding: 6px 10px;
-        font-size: 14px;
-        border-radius: 5px;
-        text-decoration: none;
-    }
-
-    .actions form {
-        margin: 0;
-    }
-
-    .actions a {
-        color: #0e7de4;
-    }
-</style>
-
-<table>
-    <thead>
-        <tr>
-            <th>지점명</th>
-            <th>전화번호</th>
-            <th>채팅 주소</th>
-            <th>접속 코드</th>
-            <th>QR 코드</th>
-            <th>관리</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for branch in branches %}
-        <tr>
-            <!-- 지점명 -->
-            <td><a href="{{ url_for('branch_page', slug=branch[3]) }}" target="_blank">{{ branch[0] }}</a></td>
-
-            <!-- 전화번호 -->
-            <td>{{ branch[1] }}</td>
-
-            <!-- 채팅 주소 -->
-            <td><a href="{{ branch[2] }}" target="_blank">{{ branch[2] }}</a></td>
-
-            <!-- 접속 코드 -->
-            <td>{{ branch[3] }}</td>
-
-            <!-- QR 코드 -->
-            <td>
-                {% set qr_url = request.url_root ~ 'b/' ~ branch[3] %}
-                <a href="{{ qr_url }}" target="_blank">
-                    <img class="qr" src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data={{ qr_url | urlencode }}" alt="QR Code">
-                </a>
-                <br>
-                <a class="download-link"
-                   href="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data={{ qr_url | urlencode }}"
-                   download="QR_{{ branch[3] }}.png">
-                   ⬇️ 다운로드
-                </a>
-            </td>
-
-            <!-- 관리 -->
-            <td class="actions">
-                <form method="POST" action="{{ url_for('delete_branch', slug=branch[3]) }}">
-                    <button type="submit">🗑️ 삭제</button>
-                </form>
-                <a href="{{ url_for('edit_branch', slug=branch[3]) }}">✏️ 수정</a>
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+    <div class="table-responsive">
+        <table class="table table-bordered align-middle">
+            <thead class="table-primary">
+            <tr>
+                <th>지점명</th>
+                <th>전화번호</th>
+                <th>채팅 주소</th>
+                <th>접속 코드</th>
+                <th>QR 코드</th>
+                <th style="min-width: 80px;">관리</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for branch in branches %}
+                <tr>
+                    <td>{{ branch.name }}</td>
+                    <td>{{ branch.phone }}</td>
+                    <td><a href="{{ branch.chat_url }}" target="_blank">{{ branch.chat_url }}</a></td>
+                    <td>{{ branch.slug }}</td>
+                    <td>
+                        <img src="{{ url_for('generate_qr', slug=branch.slug) }}" alt="QR 코드" class="qr-image mb-1">
+                        <br>
+                        <a class="qr-download text-primary" href="{{ url_for('generate_qr', slug=branch.slug) }}" download="{{ branch.slug }}.png">📥 다운로드</a>
+                    </td>
+                    <td class="action-buttons">
+                        <form method="POST" action="{{ url_for('delete_branch', branch_id=branch.id) }}">
+                            <button type="submit" class="btn btn-danger btn-sm">🗑 삭제</button>
+                        </form>
+                        <a href="{{ url_for('edit_branch_page', branch_id=branch.id) }}" class="btn btn-outline-primary btn-sm">✏ 수정</a>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>
+""
