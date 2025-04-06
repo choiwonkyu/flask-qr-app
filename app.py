@@ -53,7 +53,7 @@ def add_branch_page():
             conn.rollback()
             return "❌ 이미 존재하는 슬러그입니다."
 
-    cur.execute("SELECT * FROM branches ORDER BY id DESC")
+    cur.execute("SELECT name, phone, chat_url, slug FROM branches ORDER BY id DESC")
     branches = cur.fetchall()
     cur.close()
     conn.close()

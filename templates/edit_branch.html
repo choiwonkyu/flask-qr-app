@@ -23,7 +23,7 @@
             display: block;
             margin-top: 15px;
         }
-        input[type="text"], input[type="url"], input[type="password"] {
+        input[type="text"], input[type="url"] {
             width: 100%;
             padding: 8px;
             margin-top: 5px;
@@ -58,9 +58,6 @@
 
         <label for="chat_url">채팅 URL:</label>
         <input type="url" name="chat_url" value="{{ branch[3] }}" required>
-
-        <label for="password">관리자 비밀번호:</label>
-        <input type="password" name="password" required>
 
         <button type="submit">수정 완료</button>
     </form>

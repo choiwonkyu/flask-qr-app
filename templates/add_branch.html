@@ -2,99 +2,37 @@
 <html>
 <head>
     <title>지점 관리</title>
-    <style>
-        body {
-            font-family: sans-serif;
-            padding: 40px;
-            background-color: #f4f4f4;
-        }
-        h2 {
-            text-align: center;
-            font-size: 32px;
-        }
-        form {
-            max-width: 500px;
-            margin: 0 auto 40px;
-            background-color: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
-        input {
-            width: 100%;
-            padding: 15px;
-            margin: 10px 0;
-            font-size: 16px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-        }
-        button {
-            width: 100%;
-            padding: 15px;
-            font-size: 18px;
-            background-color: #2196F3;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #1976D2;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 30px;
-            background-color: white;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-        }
-        th, td {
-            padding: 15px;
-            border: 1px solid #ddd;
-            text-align: center;
-        }
-        th {
-            background-color: #f0f0f0;
-        }
-        a.button {
-            background-color: #4CAF50;
-            padding: 8px 12px;
-            color: white;
-            text-decoration: none;
-            border-radius: 4px;
-            display: inline-block;
-        }
-        form.inline {
-            display: inline;
-        }
-    </style>
 </head>
 <body>
-    <h2>지점 추가</h2>
+    <h1>📌 지점 추가</h1>
     <form method="post">
         <input type="text" name="name" placeholder="지점명" required>
-        <input type="text" name="phone" placeholder="업무폰 번호" required>
-        <input type="text" name="chat_url" placeholder="채팅 URL" required>
-        <input type="text" name="slug" placeholder="접속 주소 (예: gangnam)" required>
-        <button type="submit">지점 등록</button>
+        <input type="text" name="phone" placeholder="전화번호" required>
+        <input type="text" name="chat_url" placeholder="채팅 주소" required>
+        <input type="text" name="slug" placeholder="접속 코드 (영문, 고유)" required>
+        <button type="submit">추가</button>
     </form>
 
-    <h2>지점 목록</h2>
-    <table>
+    <h2>📋 지점 목록</h2>
+    <table border="1">
         <tr>
             <th>지점명</th>
-            <th>번호</th>
+            <th>전화번호</th>
+            <th>채팅 주소</th>
+            <th>접속 코드</th>
             <th>관리</th>
         </tr>
         {% for branch in branches %}
         <tr>
-            <td><a href="{{ url_for('branch_page', slug=branch[4]) }}" class="button">{{ branch[1] }}</a></td>
+            <td>{{ branch[0] }}</td>
+            <td>{{ branch[1] }}</td>
             <td>{{ branch[2] }}</td>
+            <td>{{ branch[3] }}</td>
             <td>
-                <!-- 수정/삭제 기능이 필요하면 이곳에 버튼 추가 가능 -->
-                <!-- 예: 
-                <a href="{{ url_for('edit_branch', slug=branch[0]) }}" class="button">수정</a>
-                -->
+                <a href="{{ url_for('edit_branch', slug=branch[3]) }}">수정</a>
+                <form method="post" action="{{ url_for('delete_branch', slug=branch[3]) }}" style="display:inline;">
+                    <button type="submit">삭제</button>
+                </form>
             </td>
         </tr>
         {% endfor %}
