@@ -2,100 +2,100 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>지점 추가</title>
+    <title>지점 추가 및 목록</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f5f5f5;
+            background-color: #f2f2f2;
             margin: 0;
-            padding: 40px 0;
+            padding: 0;
             display: flex;
             justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
         }
+
         .container {
-            width: 90%;
             max-width: 1000px;
+            width: 90%;
+            margin-top: 40px;
+            background-color: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
+
         h2 {
             color: #333;
-            margin-top: 40px;
+            text-align: center;
         }
+
         form {
-            background: #fff;
-            padding: 25px;
-            margin-top: 20px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.05);
-            border-radius: 10px;
+            margin-bottom: 30px;
         }
+
         label {
             display: block;
             margin-top: 15px;
-            font-weight: bold;
         }
+
         input[type="text"], input[type="url"] {
             width: 100%;
-            padding: 10px;
+            padding: 8px;
             margin-top: 5px;
-            border-radius: 6px;
+            border-radius: 5px;
             border: 1px solid #ccc;
         }
+
         button {
             margin-top: 20px;
-            padding: 12px 20px;
+            padding: 10px 20px;
             background-color: #0e7de4;
             color: white;
             border: none;
-            border-radius: 6px;
+            border-radius: 5px;
             cursor: pointer;
-            font-size: 15px;
         }
+
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 40px;
-            background: #fff;
-            box-shadow: 0 0 8px rgba(0,0,0,0.05);
-            border-radius: 10px;
-            overflow: hidden;
+            margin-top: 30px;
         }
+
         th, td {
-            padding: 16px;
             border: 1px solid #ddd;
+            padding: 10px;
             text-align: center;
-            font-size: 14px;
+            vertical-align: middle;
         }
+
         th {
             background-color: #f0f0f0;
         }
-        a.button {
-            background-color: #4CAF50;
-            color: white;
-            padding: 6px 12px;
-            border-radius: 4px;
-            text-decoration: none;
-        }
-        form button {
-            background-color: #e74c3c;
-        }
+
         a {
             color: #0e7de4;
             text-decoration: none;
         }
-        a:hover {
-            text-decoration: underline;
+
+        img.qr {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            margin-top: 5px;
         }
-        .qr-actions {
+
+        .actions {
             display: flex;
             flex-direction: column;
             gap: 5px;
         }
     </style>
-    <!-- QR 생성용 라이브러리 -->
-    <script src="https://cdn.jsdelivr.net/npm/qrious/dist/qrious.min.js"></script>
 </head>
 <body>
 <div class="container">
-    <h2>➕ 지점 추가</h2>
+    <h2>🏨 지점 추가</h2>
     <form method="POST">
         <label for="name">지점 이름:</label>
         <input type="text" name="name" required>
@@ -106,10 +106,10 @@
         <label for="chat_url">채팅 URL:</label>
         <input type="url" name="chat_url" required>
 
-        <label for="slug">접속 코드 (slug):</label>
+        <label for="slug">접속 코드 (예: abc123):</label>
         <input type="text" name="slug" required>
 
-        <button type="submit">등록</button>
+        <button type="submit">➕ 지점 추가</button>
     </form>
 
     <h2>📋 지점 목록</h2>
@@ -121,55 +121,31 @@
             <th>채팅 주소</th>
             <th>접속 코드</th>
             <th>QR 코드</th>
-            <th>수정</th>
-            <th>삭제</th>
+            <th>관리</th>
         </tr>
         </thead>
         <tbody>
         {% for branch in branches %}
         <tr>
-            <td><a href="{{ url_for('branch_page', slug=branch[4]) }}">{{ branch[1] }}</a></td>
+            <td><a href="{{ url_for('branch_page', slug=branch[4]) }}" target="_blank">{{ branch[1] }}</a></td>
             <td>{{ branch[2] }}</td>
             <td><a href="{{ branch[3] }}" target="_blank">{{ branch[3] }}</a></td>
             <td>{{ branch[4] }}</td>
             <td>
-                <div class="qr-actions">
-                    <canvas id="qr-{{ loop.index }}" style="display:none;"></canvas>
-                    <button onclick="generateQR('{{ branch[4] }}', {{ loop.index }})">생성</button>
-                    <button onclick="downloadQR({{ loop.index }}, '{{ branch[1] }}')">다운</button>
-                </div>
+                <img class="qr" src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={{ request.host_url }}b/{{ branch[4] }}" alt="QR Code">
+                <br>
+                <a href="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={{ request.host_url }}b/{{ branch[4] }}" download="QR_{{ branch[4] }}.png">⬇️ 다운로드</a>
             </td>
-            <td>
-                <a href="{{ url_for('edit_branch', slug=branch[4]) }}" class="button">수정</a>
-            </td>
-            <td>
+            <td class="actions">
                 <form method="POST" action="{{ url_for('delete_branch', slug=branch[4]) }}">
-                    <button type="submit">삭제</button>
+                    <button type="submit">🗑️ 삭제</button>
                 </form>
+                <a href="{{ url_for('edit_branch', slug=branch[4]) }}">✏️ 수정</a>
             </td>
         </tr>
         {% endfor %}
         </tbody>
     </table>
 </div>
-
-<script>
-    function generateQR(slug, index) {
-        const qr = new QRious({
-            element: document.getElementById('qr-' + index),
-            value: window.location.origin + '/b/' + slug,
-            size: 200
-        });
-        document.getElementById('qr-' + index).style.display = 'block';
-    }
-
-    function downloadQR(index, branchName) {
-        const canvas = document.getElementById('qr-' + index);
-        const link = document.createElement('a');
-        link.href = canvas.toDataURL("image/png");
-        link.download = branchName + '_QR.png';
-        link.click();
-    }
-</script>
 </body>
 </html>
