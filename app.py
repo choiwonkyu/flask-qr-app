@@ -136,13 +136,14 @@ def branch_page(slug):
 # ===============================
 @app.route('/qr/<slug>')
 def generate_qr(slug):
+    # 지점 전용 페이지 URL을 생성
     url = url_for('branch_page', slug=slug, _external=True)
     qr = qrcode.make(url)
+
     img_io = BytesIO()
     qr.save(img_io, 'PNG')
     img_io.seek(0)
     return send_file(img_io, mimetype='image/png')
-
 # ===============================
 # 앱 실행
 # ===============================
