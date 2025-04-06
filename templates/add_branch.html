@@ -1,187 +1,110 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <title>지점 추가 및 목록</title>
-    <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f0f0f0;
-            padding: 40px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
+<style>
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+        background: #fff;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        border-radius: 10px;
+        overflow: hidden;
+    }
 
-        h2 {
-            color: #333;
-        }
+    th, td {
+        padding: 15px;
+        text-align: center;
+        border-bottom: 1px solid #ddd;
+        vertical-align: top;
+    }
 
-        form {
-            background: #fff;
-            padding: 20px 30px;
-            margin-bottom: 40px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            border-radius: 10px;
-            width: 500px;
-        }
+    th {
+        background-color: #e8f0fe;
+    }
 
-        label {
-            display: block;
-            margin-top: 15px;
-        }
+    img.qr {
+        width: 120px;
+        height: 120px;
+    }
 
-        input[type="text"], input[type="url"] {
-            width: 100%;
-            padding: 8px;
-            margin-top: 5px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-        }
+    .download-link {
+        display: inline-block;
+        margin-top: 5px;
+        font-size: 12px;
+    }
 
-        button {
-            margin-top: 20px;
-            padding: 10px 20px;
-            background-color: #0e7de4;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
+    .actions {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        min-width: 70px;
+    }
 
-        table {
-            width: 1100px;
-            border-collapse: collapse;
-            margin-top: 20px;
-            background: #fff;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            border-radius: 10px;
-            overflow: hidden;
-        }
+    .actions button,
+    .actions a {
+        margin: 0;
+        padding: 6px 10px;
+        font-size: 14px;
+        border-radius: 5px;
+        text-decoration: none;
+    }
 
-        th, td {
-            padding: 15px;
-            text-align: center;
-            border-bottom: 1px solid #ddd;
-        }
+    .actions form {
+        margin: 0;
+    }
 
-        th {
-            background-color: #e8f0fe;
-        }
+    .actions a {
+        color: #0e7de4;
+    }
+</style>
 
-        th:nth-child(1), td:nth-child(1) { width: 20%; }
-        th:nth-child(2), td:nth-child(2) { width: 15%; }
-        th:nth-child(3), td:nth-child(3) { width: 25%; }
-        th:nth-child(4), td:nth-child(4) { width: 10%; }
-        th:nth-child(5), td:nth-child(5) { width: 15%; }
-        th:nth-child(6), td:nth-child(6) {
-            min-width: 80px;
-            width: 1%;
-            white-space: nowrap;
-        }
+<table>
+    <thead>
+        <tr>
+            <th>지점명</th>
+            <th>전화번호</th>
+            <th>채팅 주소</th>
+            <th>접속 코드</th>
+            <th>QR 코드</th>
+            <th>관리</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for branch in branches %}
+        <tr>
+            <!-- 지점명 -->
+            <td><a href="{{ url_for('branch_page', slug=branch[3]) }}" target="_blank">{{ branch[0] }}</a></td>
 
-        img.qr {
-            width: 100px;
-            height: 100px;
-        }
+            <!-- 전화번호 -->
+            <td>{{ branch[1] }}</td>
 
-        .download-link {
-            display: inline-block;
-            margin-top: 5px;
-            font-size: 12px;
-        }
+            <!-- 채팅 주소 -->
+            <td><a href="{{ branch[2] }}" target="_blank">{{ branch[2] }}</a></td>
 
-        .actions {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 6px;
-        }
+            <!-- 접속 코드 -->
+            <td>{{ branch[3] }}</td>
 
-        .actions form {
-            margin: 0;
-        }
+            <!-- QR 코드 -->
+            <td>
+                {% set qr_url = request.url_root ~ 'b/' ~ branch[3] %}
+                <a href="{{ qr_url }}" target="_blank">
+                    <img class="qr" src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data={{ qr_url | urlencode }}" alt="QR Code">
+                </a>
+                <br>
+                <a class="download-link"
+                   href="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data={{ qr_url | urlencode }}"
+                   download="QR_{{ branch[3] }}.png">
+                   ⬇️ 다운로드
+                </a>
+            </td>
 
-        .actions button {
-            padding: 6px 10px;
-            font-size: 13px;
-        }
-
-        .actions a {
-            font-size: 13px;
-        }
-
-        a {
-            color: #0e7de4;
-            text-decoration: none;
-        }
-    </style>
-</head>
-<body>
-    <h2>🏢 지점 추가</h2>
-    <form method="POST">
-        <label for="name">지점명:</label>
-        <input type="text" name="name" required>
-
-        <label for="phone">전화번호:</label>
-        <input type="text" name="phone" required>
-
-        <label for="chat_url">채팅 URL:</label>
-        <input type="url" name="chat_url" required>
-
-        <label for="slug">접속 코드 (예: abc123):</label>
-        <input type="text" name="slug" required>
-
-        <button type="submit">➕ 지점 추가</button>
-    </form>
-
-    <h2>📋 지점 목록</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>지점명</th>
-                <th>전화번호</th>
-                <th>채팅 주소</th>
-                <th>접속 코드</th>
-                <th>QR 코드</th>
-                <th>관리</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for branch in branches %}
-            <tr>
-                <!-- 지점명 -->
-                <td><a href="{{ url_for('branch_page', slug=branch[3]) }}" target="_blank">{{ branch[0] }}</a></td>
-
-                <!-- 전화번호 -->
-                <td>{{ branch[1] }}</td>
-
-                <!-- 채팅 주소 -->
-                <td><a href="{{ branch[2] }}" target="_blank">{{ branch[2] }}</a></td>
-
-                <!-- 접속 코드 -->
-                <td>{{ branch[3] }}</td>
-
-                <!-- QR 코드 -->
-                <td>
-                    {% set qr_url = request.url_root ~ 'b/' ~ branch[3] %}
-                    <a href="{{ qr_url }}" target="_blank">
-                        <img class="qr" src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={{ qr_url | urlencode }}" alt="QR Code">
-                    </a>
-                    <br>
-                    <a class="download-link" href="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={{ qr_url | urlencode }}" download="QR_{{ branch[3] }}.png">⬇️ 다운로드</a>
-                </td>
-
-                <!-- 관리 -->
-                <td class="actions">
-                    <form method="POST" action="{{ url_for('delete_branch', slug=branch[3]) }}">
-                        <button type="submit">🗑️ 삭제</button>
-                    </form>
-                    <a href="{{ url_for('edit_branch', slug=branch[3]) }}">✏️ 수정</a>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</body>
-</html>
+            <!-- 관리 -->
+            <td class="actions">
+                <form method="POST" action="{{ url_for('delete_branch', slug=branch[3]) }}">
+                    <button type="submit">🗑️ 삭제</button>
+                </form>
+                <a href="{{ url_for('edit_branch', slug=branch[3]) }}">✏️ 수정</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
