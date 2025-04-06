@@ -122,14 +122,21 @@ def branch_page(slug):
     conn = get_db_connection()
     cur = conn.cursor()
     cur.execute("SELECT name, phone, chat_url FROM branches WHERE slug = %s", (slug,))
-    branch = cur.fetchone()
+    row = cur.fetchone()
     cur.close()
     conn.close()
 
-    if not branch:
+    if not row:
         return "❌ 지점 정보를 찾을 수 없습니다.", 404
 
-    return render_template('branch_page.html', name=branch[0], phone=branch[1], chat_url=branch[2])
+    # 튜플을 딕셔너리로 변환
+    branch = {
+        'name': row[0],
+        'phone': row[1],
+        'chat_url': row[2]
+    }
+
+    return render_template('branch_page.html', branch=branch)
 
 # ===============================
 # QR 코드 생성
